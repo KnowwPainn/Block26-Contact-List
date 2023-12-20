@@ -1,5 +1,5 @@
 // Importing React and necessary assets
-import React from 'react';
+import React, { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
@@ -9,6 +9,9 @@ import ContactList from './components/ContactList'; // Import the ContactList co
 const App = () => {
   // State for counting
   const [count, setCount] = React.useState(0);
+
+  // State for selected contact ID
+  const [selectedContactId, setSelectedContactId] = useState(null);
 
   return (
     <>
@@ -37,8 +40,16 @@ const App = () => {
         Click on the Vite and React logos to learn more
       </p>
 
-      {/* ContactList component */}
-      <ContactList />
+      {/* Selected Contact View */}
+      {selectedContactId ? (
+        <div>
+          <h2>Selected Contact View</h2>
+          {/* Render details of the selected contact here */}
+        </div>
+      ) : (
+        // Render ContactList component with setSelectedContactId prop
+        <ContactList setSelectedContactId={setSelectedContactId} />
+      )}
     </>
   );
 };

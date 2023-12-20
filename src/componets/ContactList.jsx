@@ -1,42 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import ContactRow from './ContactRow';
 
-// Dummy contacts data
-const dummyContacts = [
-  { id: 1, name: "R2-D2", phone: "222-222-2222", email: "r2d2@droids.com" },
-  { id: 2, name: "C-3PO", phone: "333-333-3333", email: "c3po@droids.com" },
-  { id: 3, name: "BB-8", phone: "888-888-8888", email: "bb8@droids.com" },
-];
-
-export default function ContactList() {
+const ContactList = ({ setSelectedContactId }) => {
   // State for contacts
-  const [contacts, setContacts] = useState(dummyContacts);
+  const [contacts, setContacts] = useState([]);
 
-  // useEffect hook for fetching data
+  // State for fetching status
+  const [isFetching, setIsFetching] = useState(false);
+
+  // State for potential error
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     async function fetchContacts() {
-      try {
-        // Fetch data from the API
-        const response = await fetch('https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users');
+      setIsFetching(true);
 
-        // Parse the response
+      try {
+        const response = await fetch('https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users');
         const data = await response.json();
 
-        // Log the data to the console
-        console.log('Data from API:', data);
-
-        // Set the contacts state with the fetched data
         setContacts(data);
+        setIsFetching(false);
       } catch (error) {
-        console.error(error);
+        setError(error);
+        setIsFetching(false);
       }
     }
 
-    // Call the fetchContacts function
     fetchContacts();
-  }, []);
+  }, []); // Run effect only once on mount
 
   // Log contacts to console
-  console.log("Contacts: ", contacts);
+  console.log('Contacts: ', contacts);
+
+  if (isFetching) {
+    return <p>Loading contacts...</p>;
+  }
+
+  if (error) {
+    return <p>Error fetching contacts: {error.message}</p>;
+  }
 
   return (
     <table>
@@ -51,15 +54,16 @@ export default function ContactList() {
           <td>Email</td>
           <td>Phone</td>
         </tr>
-        {/* Map over contacts data */}
         {contacts.map((contact) => (
-          <tr key={contact.id}>
-            <td>{contact.name}</td>
-            <td>{contact.email}</td>
-            <td>{contact.phone}</td>
-          </tr>
+          <ContactRow
+            key={contact.id}
+            contact={contact}
+            onClick={() => setSelectedContactId(contact.id)}
+          />
         ))}
       </tbody>
     </table>
   );
-}
+};
+
+export default ContactList;
